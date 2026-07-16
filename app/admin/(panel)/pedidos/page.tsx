@@ -74,7 +74,7 @@ export default async function PedidosAdmin({ searchParams }: Props) {
                 </span>
               )}
             </p>
-            {p.clientes?.whatsapp && (
+            {p.clientes?.whatsapp ? (
               <a
                 href={`https://wa.me/${p.clientes.whatsapp}`}
                 target="_blank"
@@ -83,6 +83,12 @@ export default async function PedidosAdmin({ searchParams }: Props) {
               >
                 Responder por WhatsApp
               </a>
+            ) : (
+              p.clientes?.email && (
+                <p className="mt-2 text-xs text-tinta/50">
+                  El cliente te escribe por WhatsApp al enviar su pedido · ✉️ {p.clientes.email}
+                </p>
+              )
             )}
           </li>
         ))}

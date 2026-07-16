@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FormularioRegistro, { leerClienteLocal } from './FormularioRegistro';
 import { actualizarPremium } from '@/app/acciones/cliente';
+import { enlaceWhatsAppPremium } from '@/lib/whatsapp';
 import { trackEvento } from '@/lib/meta';
 import type { ClienteLocal, Pais } from '@/lib/tipos';
 
@@ -54,15 +55,24 @@ export default function FormularioPremium({ pais }: { pais: Pais | null }) {
         <p className="text-5xl">🎉</p>
         <h2 className="mt-3 text-xl font-bold">¡Ya eres Ñañilover Premium!</h2>
         <p className="mt-2 text-tinta/70">
-          Guardamos los datos de tu emprendimiento. Desde ahora recibes atención
-          prioritaria en cada pedido.
+          Guardamos los datos de tu emprendimiento. Desde ahora tienes una línea
+          de WhatsApp exclusiva con atención prioritaria.
         </p>
-        <Link
-          href="/catalogo"
-          className="mt-4 inline-block rounded-full bg-celeste px-6 py-3 font-bold text-white"
+        <a
+          href={enlaceWhatsAppPremium(
+            `Hola 👋 Soy ${cliente?.nombre ?? ''} de ${nombreTienda} y acabo de activar mi cuenta Premium en la web de Ñañitos. [web-premium]`
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-block rounded-full bg-whatsapp px-6 py-3 font-bold text-white shadow-md"
         >
-          Seguir explorando el catálogo
-        </Link>
+          ⭐ Escribir a mi asesor Premium
+        </a>
+        <div className="mt-3">
+          <Link href="/catalogo" className="text-sm font-bold text-celeste">
+            Seguir explorando el catálogo →
+          </Link>
+        </div>
       </div>
     );
   }

@@ -5,45 +5,27 @@ import { crearClienteAdmin } from '@/lib/supabase/admin';
 import { COOKIE_CLIENTE, esPais } from '@/lib/pais';
 import type { Modalidad, Pais } from '@/lib/tipos';
 
-const PREFIJOS: Record<Pais, string> = { BO: '591', AR: '54' };
-
-function normalizarWhatsApp(entrada: string, pais: Pais): string | null {
-  const digitos = entrada.replace(/\D/g, '');
-  if (digitos.length < 8) return null;
-  const prefijo = PREFIJOS[pais];
-  const numero = digitos.startsWith(prefijo) ? digitos : `${prefijo}${digitos}`;
-  // BO: 591 + 8 dígitos = 11 · AR: 54 + 10/11 dígitos (con o sin 9) = 12/13
-  if (pais === 'BO' && numero.length !== 11) return null;
-  if (pais === 'AR' && (numero.length < 12 || numero.length > 13)) return null;
-  return numero;
-}
-
 export interface ResultadoRegistro {
   ok: boolean;
   error?: string;
   cliente?: { id: string; nombre: string; ciudad: string; pais: Pais };
 }
 
-/** Registro único del comprador: upsert por whatsapp. */
+/** Registro único del comprador: upsert por correo (viene de Google). */
 export async function registrarCliente(datos: {
   nombre: string;
   email: string;
-  whatsapp: string;
   pais: string;
   ciudad: string;
 }): Promise<ResultadoRegistro> {
   const nombre = datos.nombre.trim();
   const ciudad = datos.ciudad.trim();
-  const email = datos.email.trim();
+  const email = datos.email.trim().toLowerCase();
   if (nombre.length < 2) return { ok: false, error: 'Escribe tu nombre.' };
   if (ciudad.length < 2) return { ok: false, error: 'Escribe tu ciudad.' };
   if (!esPais(datos.pais)) return { ok: false, error: 'Elige tu país.' };
-  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return { ok: false, error: 'Revisa tu correo electrónico.' };
-  }
-  const whatsapp = normalizarWhatsApp(datos.whatsapp, datos.pais);
-  if (!whatsapp) {
-    return { ok: false, error: 'Revisa tu número de WhatsApp (con código de área).' };
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { ok: false, error: 'Conecta tu cuenta de Google para continuar.' };
   }
 
   const supabase = crearClienteAdmin();
@@ -56,13 +38,12 @@ export async function registrarCliente(datos: {
     .upsert(
       {
         nombre,
-        email: email || null,
-        whatsapp,
+        email,
         pais: datos.pais,
         ciudad,
         origen: 'web-catalogo',
       },
-      { onConflict: 'whatsapp' }
+      { onConflict: 'email' }
     )
     .select('id, nombre, ciudad, pais')
     .single();

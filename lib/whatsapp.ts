@@ -1,7 +1,12 @@
 import type { Modalidad, Pais } from './tipos';
 
+/** Ventas: pedidos y consultas del catálogo (atiende Valeria). */
 export const NUMERO_WHATSAPP =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '59174508045';
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '59162404153';
+
+/** Línea exclusiva para clientes Premium. */
+export const NUMERO_WHATSAPP_PREMIUM =
+  process.env.NEXT_PUBLIC_WHATSAPP_PREMIUM ?? '59174508045';
 
 const NOMBRE_PAIS: Record<Pais, string> = { BO: 'Bolivia', AR: 'Argentina' };
 
@@ -60,4 +65,8 @@ export function mensajeConsulta() {
 
 export function enlaceWhatsApp(mensaje: string) {
   return `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+}
+
+export function enlaceWhatsAppPremium(mensaje: string) {
+  return `https://wa.me/${NUMERO_WHATSAPP_PREMIUM}?text=${encodeURIComponent(mensaje)}`;
 }

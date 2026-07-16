@@ -53,6 +53,16 @@ export default function Footer() {
           <h3 className="mb-2 text-base font-bold text-amarillo">Visítanos</h3>
           <p>Calle Colorados, frente al Hotel La Costa</p>
           <p>Bermejo, Tarija — Bolivia</p>
+          <p>
+            <a
+              href="https://maps.app.goo.gl/eNGnLRsE3otx73kJ7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-amarillo hover:underline"
+            >
+              📍 Ver en Google Maps
+            </a>
+          </p>
           <p className="mt-2">Horarios: [INSERTAR: horarios de atención]</p>
           <a
             href={enlaceWhatsApp(mensajeConsulta())}

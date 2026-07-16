@@ -196,9 +196,9 @@ export default async function Home() {
         <BloqueLogistica pais={pais} />
       </section>
 
-      {/* Confianza */}
-      <section className="mt-10 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-tinta/5">
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
+      {/* Confianza + ubicación */}
+      <section className="mt-10 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-tinta/5">
+        <div className="flex flex-col items-center gap-4 p-6 sm:flex-row">
           <Image
             src="/brand/logo-nanitos.png"
             alt="Ñañitos, tu importadora de frontera"
@@ -210,10 +210,25 @@ export default async function Home() {
             <p className="mt-1 text-sm text-tinta/70">
               Estamos en Calle Colorados, frente al Hotel La Costa, en Bermejo.
               Puedes visitarnos, escribirnos por WhatsApp o seguirnos en redes.
-              [INSERTAR: fotos reales de la tienda y del equipo]
             </p>
+            <a
+              href="https://maps.app.goo.gl/eNGnLRsE3otx73kJ7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block rounded-full bg-celeste px-4 py-2 text-sm font-bold text-white"
+            >
+              📍 Cómo llegar
+            </a>
           </div>
         </div>
+        <iframe
+          src="https://www.google.com/maps?q=-22.730465,-64.349883&z=17&output=embed"
+          title="Ubicación de Juguetería Ñañitos en Bermejo"
+          className="h-64 w-full border-0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
       </section>
     </div>
   );

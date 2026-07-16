@@ -65,14 +65,25 @@ export default async function ClientesAdmin({ searchParams }: Props) {
                   </p>
                 )}
               </div>
-              <a
-                href={`https://wa.me/${c.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-whatsapp px-4 py-1.5 text-sm font-bold text-white"
-              >
-                +{c.whatsapp}
-              </a>
+              {c.whatsapp ? (
+                <a
+                  href={`https://wa.me/${c.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-whatsapp px-4 py-1.5 text-sm font-bold text-white"
+                >
+                  +{c.whatsapp}
+                </a>
+              ) : (
+                c.email && (
+                  <a
+                    href={`mailto:${c.email}`}
+                    className="rounded-full bg-celeste/10 px-4 py-1.5 text-sm font-bold text-celeste"
+                  >
+                    ✉️ {c.email}
+                  </a>
+                )
+              )}
             </div>
           </li>
         ))}
