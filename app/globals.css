@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-crema text-tinta font-cuerpo;
+}
+
+h1, h2, h3, h4 {
+  @apply font-titulo;
+}
+
+/* Targets táctiles cómodos en móvil */
+button, a.boton {
+  min-height: 44px;
+}
+
+/* Oculta la barra de scroll horizontal de los carruseles sin quitar el gesto */
+.sin-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.sin-scrollbar {
+  scrollbar-width: none;
+}
