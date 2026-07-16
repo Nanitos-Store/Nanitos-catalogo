@@ -9,5 +9,5 @@
 insert into public.perfiles (id, nombre, rol, activo)
 select id, 'DÚO Marketing', 'superadmin', true
 from auth.users
-where email = '[INSERTAR: email de DÚO]'
+where email = 'priscilaraquelleonluis@gmail.com'
 on conflict (id) do update set rol = 'superadmin', activo = true;
