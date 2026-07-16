@@ -36,6 +36,11 @@ export const metadata: Metadata = {
     siteName: 'Ñañitos',
     locale: 'es_BO',
     type: 'website',
+    images: [{ url: '/brand/og-nanitos.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/brand/og-nanitos.png'],
   },
 };
 

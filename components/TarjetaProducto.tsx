@@ -18,7 +18,7 @@ export default function TarjetaProducto({
     producto.producto_imagenes?.[0];
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-tinta/5 transition hover:shadow-md">
+    <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-tinta/5 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/producto/${producto.slug}`} className="relative block">
         {producto.en_oferta && (
           <span className="absolute left-2 top-2 z-10 rounded-full bg-coral px-2.5 py-1 text-xs font-bold text-white">

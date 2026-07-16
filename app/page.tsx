@@ -73,7 +73,7 @@ export default async function Home() {
       {campana ? (
         <Link
           href={`/campana/${campana.slug}`}
-          className="mt-4 block overflow-hidden rounded-3xl bg-gradient-to-r from-celeste to-verde p-6 text-white shadow-lg sm:p-10"
+          className="mt-4 block animate-aparecer overflow-hidden rounded-3xl bg-gradient-to-r from-celeste to-verde p-6 text-white shadow-lg transition hover:shadow-xl sm:p-10"
         >
           <h1 className="text-2xl font-bold sm:text-4xl">{campana.titulo}</h1>
           {campana.subtitulo && (
@@ -86,7 +86,7 @@ export default async function Home() {
           </span>
         </Link>
       ) : (
-        <div className="mt-4 rounded-3xl bg-gradient-to-r from-celeste to-verde p-6 text-white shadow-lg sm:p-10">
+        <div className="mt-4 animate-aparecer rounded-3xl bg-gradient-to-r from-celeste to-verde p-6 text-white shadow-lg sm:p-10">
           <h1 className="text-2xl font-bold sm:text-4xl">
             Juguetes y novedades por docena y por caja
           </h1>
@@ -136,7 +136,7 @@ export default async function Home() {
               Ver todo →
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="aparicion-escalonada grid grid-cols-2 gap-3 sm:grid-cols-4">
             {destacados.map((p, i) => (
               <TarjetaProducto key={p.id} producto={p} pais={pais} prioridad={i < 2} />
             ))}
@@ -153,7 +153,7 @@ export default async function Home() {
               Ver todas →
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="aparicion-escalonada grid grid-cols-2 gap-3 sm:grid-cols-4">
             {ofertas.map((p) => (
               <TarjetaProducto key={p.id} producto={p} pais={pais} />
             ))}

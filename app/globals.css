@@ -6,6 +6,24 @@
   color-scheme: light;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Aparición escalonada de las cards de la grilla */
+@media (prefers-reduced-motion: no-preference) {
+  .aparicion-escalonada > * {
+    animation: aparecer 0.45s ease-out both;
+  }
+  .aparicion-escalonada > *:nth-child(2) { animation-delay: 0.05s; }
+  .aparicion-escalonada > *:nth-child(3) { animation-delay: 0.1s; }
+  .aparicion-escalonada > *:nth-child(4) { animation-delay: 0.15s; }
+  .aparicion-escalonada > *:nth-child(5) { animation-delay: 0.2s; }
+  .aparicion-escalonada > *:nth-child(6) { animation-delay: 0.25s; }
+  .aparicion-escalonada > *:nth-child(7) { animation-delay: 0.3s; }
+  .aparicion-escalonada > *:nth-child(8) { animation-delay: 0.35s; }
+}
+
 body {
   @apply bg-crema text-tinta font-cuerpo;
 }
