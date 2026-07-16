@@ -31,6 +31,29 @@ export function mensajePedido(opciones: {
   );
 }
 
+export function mensajePedidoCarrito(opciones: {
+  nombre: string;
+  ciudad: string;
+  pais: Pais;
+  items: { nombre: string; codigo: string | null; modalidad: Modalidad; cantidad: number }[];
+  identificador?: string;
+}) {
+  const { nombre, ciudad, pais, items } = opciones;
+  const id = opciones.identificador ?? 'web-catalogo';
+  const lineas = items
+    .map((i) => {
+      const cod = i.codigo ? ` (Cód. ${i.codigo})` : '';
+      const cant = i.modalidad === 'ambas' ? '' : ` ×${i.cantidad}`;
+      return `• ${i.nombre}${cod} — ${TEXTO_MODALIDAD[i.modalidad]}${cant}`;
+    })
+    .join('\n');
+  return (
+    `Hola 👋 Soy ${nombre} de ${ciudad}, ${NOMBRE_PAIS[pais]}.\n` +
+    `Quiero hacer este pedido:\n${lineas}\n` +
+    `Vi los productos en la web de Ñañitos. [${id}]`
+  );
+}
+
 export function mensajeConsulta() {
   return 'Hola 👋 Tengo una consulta sobre un producto. [web-consulta]';
 }

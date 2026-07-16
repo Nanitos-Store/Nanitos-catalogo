@@ -67,6 +67,12 @@ export default async function PedidosAdmin({ searchParams }: Props) {
                 <span className="text-tinta/50">({p.productos.codigo})</span>
               )}{' '}
               · <span className="font-semibold text-celeste">{p.modalidad}</span>
+              {p.cantidad > 1 && <span className="font-semibold"> ×{p.cantidad}</span>}
+              {p.grupo_id && (
+                <span className="ml-1 rounded-full bg-tinta/5 px-2 py-0.5 text-xs text-tinta/50">
+                  🛒 pedido #{p.grupo_id.slice(0, 6)}
+                </span>
+              )}
             </p>
             {p.clientes?.whatsapp && (
               <a

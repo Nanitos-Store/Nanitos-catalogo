@@ -48,6 +48,7 @@ export default function FormProducto({
     etiqueta_oferta: producto?.etiqueta_oferta ?? null,
     disponible: producto?.disponible ?? true,
     destacado: producto?.destacado ?? false,
+    stock_cajas: producto?.stock_cajas ?? null,
   });
   const [imagenes, setImagenes] = useState<{ url: string }[]>(
     (producto?.producto_imagenes ?? [])
@@ -242,6 +243,25 @@ export default function FormProducto({
             className={campo}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-bold">
+          Stock (cajas en depósito — solo lo ves tú)
+        </label>
+        <input
+          value={datos.stock_cajas ?? ''}
+          onChange={(e) =>
+            actualizar('stock_cajas', e.target.value ? Number(e.target.value) : null)
+          }
+          inputMode="numeric"
+          className={campo}
+          placeholder="Vacío = sin control de stock"
+        />
+        <p className="mt-1 text-xs text-tinta/50">
+          Es un contador interno de referencia. Para ocultar el producto de la
+          web usa el interruptor “Disponible”.
+        </p>
       </div>
 
       <div>

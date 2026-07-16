@@ -6,7 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BotonFlotanteWhatsApp from '@/components/BotonFlotanteWhatsApp';
 import MetaPixel from '@/components/MetaPixel';
-import { BarraPais } from '@/components/SelectorPais';
+import CarritoProvider from '@/components/CarritoProvider';
+import HojaCarrito from '@/components/HojaCarrito';
 import { COOKIE_PAIS, esPais } from '@/lib/pais';
 import './globals.css';
 
@@ -46,13 +47,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={`${baloo.variable} ${nunito.variable}`}>
       <body>
         <MetaPixel />
-        <BarraPais paisActual={pais} />
-        <Suspense>
-          <Header pais={pais} />
-        </Suspense>
-        <main className="min-h-[60dvh]">{children}</main>
-        <Footer />
-        <BotonFlotanteWhatsApp pais={pais} />
+        <CarritoProvider>
+          <Suspense>
+            <Header pais={pais} />
+          </Suspense>
+          <main className="min-h-[60dvh]">{children}</main>
+          <Footer />
+          <BotonFlotanteWhatsApp pais={pais} />
+          <HojaCarrito pais={pais} />
+        </CarritoProvider>
       </body>
     </html>
   );

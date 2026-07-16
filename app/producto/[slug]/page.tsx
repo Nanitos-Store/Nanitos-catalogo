@@ -6,7 +6,7 @@ import { COOKIE_PAIS, esPais } from '@/lib/pais';
 import { puedeMostrarPrecio } from '@/lib/precios';
 import GaleriaProducto from '@/components/GaleriaProducto';
 import PrecioProducto from '@/components/PrecioProducto';
-import BotonPedido from '@/components/BotonPedido';
+import BotonAgregarCarrito from '@/components/BotonAgregarCarrito';
 import BloqueLogistica from '@/components/BloqueLogistica';
 import TarjetaProducto from '@/components/TarjetaProducto';
 import VistaProducto from '@/components/VistaProducto';
@@ -155,12 +155,15 @@ export default async function PaginaProducto({ params }: Props) {
           <BloqueLogistica pais={pais} compacto />
 
           {producto.disponible ? (
-            <BotonPedido
+            <BotonAgregarCarrito
               productoId={producto.id}
+              slug={producto.slug}
               nombre={producto.nombre}
               codigo={producto.codigo}
-              pais={pais}
-              categoria={producto.categorias?.nombre ?? null}
+              imagen={
+                (producto.producto_imagenes?.find((i) => i.es_principal) ??
+                  producto.producto_imagenes?.[0])?.url ?? null
+              }
             />
           ) : (
             <p className="rounded-xl bg-tinta/5 p-3 text-center font-semibold text-tinta/60">

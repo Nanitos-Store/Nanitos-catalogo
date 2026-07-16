@@ -40,14 +40,23 @@ export default function Footer() {
             <li><Link href="/catalogo?oferta=1" className="hover:underline">Ofertas</Link></li>
             <li><Link href="/catalogo?categoria=tendencias" className="hover:underline">Tendencias</Link></li>
             <li><Link href="/catalogo?categoria=economicos" className="hover:underline">Económicos</Link></li>
+            <li>
+              <Link href="/premium" className="font-bold text-amarillo hover:underline">
+                ⭐ Cuenta Premium Ñañilovers
+              </Link>
+            </li>
           </ul>
           <p className="mt-4 text-white/60">
             Redes: [INSERTAR: enlaces de Facebook, Instagram y TikTok]
           </p>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
-        © {new Date().getFullYear()} Juguetería Ñañitos — Bermejo, Bolivia
+      <div className="flex items-center justify-center gap-3 border-t border-white/10 py-4 text-center text-xs text-white/60">
+        <span>© {new Date().getFullYear()} Juguetería Ñañitos — Bermejo, Bolivia</span>
+        <span aria-hidden="true">·</span>
+        <Link href="/admin" className="hover:text-white/90 hover:underline">
+          Administración
+        </Link>
       </div>
     </footer>
   );

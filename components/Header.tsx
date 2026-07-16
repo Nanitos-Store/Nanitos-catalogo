@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ConmutadorPais } from './SelectorPais';
 import Buscador from './Buscador';
+import { BotonCarritoHeader } from './BotonAgregarCarrito';
 import type { Pais } from '@/lib/tipos';
 
 export default function Header({ pais }: { pais: Pais | null }) {
@@ -28,6 +29,7 @@ export default function Header({ pais }: { pais: Pais | null }) {
             Catálogo
           </Link>
           <ConmutadorPais paisActual={pais} />
+          <BotonCarritoHeader />
         </nav>
       </div>
       <div className="border-t border-tinta/5 px-4 py-2 sm:hidden">

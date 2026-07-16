@@ -43,6 +43,7 @@ export interface Producto {
   disponible: boolean;
   destacado: boolean;
   orden: number;
+  stock_cajas: number | null;
   categorias?: Categoria | null;
   producto_imagenes?: ProductoImagen[];
 }
@@ -69,6 +70,10 @@ export interface Cliente {
   pais: Pais;
   ciudad: string | null;
   origen: string;
+  es_premium: boolean;
+  nombre_tienda: string | null;
+  fanpage: string | null;
+  rubro: string | null;
   created_at: string;
 }
 
@@ -77,11 +82,24 @@ export interface Pedido {
   cliente_id: string | null;
   producto_id: string | null;
   modalidad: Modalidad;
+  cantidad: number;
+  grupo_id: string | null;
   mensaje_enviado: string | null;
   utm: Record<string, string> | null;
   created_at: string;
   clientes?: Cliente | null;
   productos?: Producto | null;
+}
+
+/** Ítem del carrito de pedido (persistido en localStorage). */
+export interface ItemCarrito {
+  productoId: string;
+  slug: string;
+  nombre: string;
+  codigo: string | null;
+  imagen: string | null;
+  modalidad: Modalidad;
+  cantidad: number;
 }
 
 export interface Perfil {

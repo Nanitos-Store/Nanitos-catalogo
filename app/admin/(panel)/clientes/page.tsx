@@ -45,11 +45,25 @@ export default async function ClientesAdmin({ searchParams }: Props) {
           <li key={c.id} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-tinta/5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="min-w-0 flex-1">
-                <p className="font-bold">{c.nombre}</p>
+                <p className="font-bold">
+                  {c.nombre}
+                  {c.es_premium && (
+                    <span className="ml-2 rounded-full bg-amarillo/20 px-2 py-0.5 text-xs font-bold text-naranja">
+                      ⭐ Premium
+                    </span>
+                  )}
+                </p>
                 <p className="text-sm text-tinta/60">
                   {c.pais === 'BO' ? '🇧🇴' : '🇦🇷'} {c.ciudad ?? 'sin ciudad'} ·{' '}
                   {new Date(c.created_at).toLocaleDateString('es-BO')}
                 </p>
+                {c.es_premium && (
+                  <p className="text-sm text-tinta/60">
+                    🏪 {c.nombre_tienda ?? 'sin nombre de tienda'}
+                    {c.fanpage && <> · 📱 {c.fanpage}</>}
+                    {c.rubro && <> · {c.rubro}</>}
+                  </p>
+                )}
               </div>
               <a
                 href={`https://wa.me/${c.whatsapp}`}

@@ -81,6 +81,7 @@ export interface DatosProducto {
   etiqueta_oferta: string | null;
   disponible: boolean;
   destacado: boolean;
+  stock_cajas: number | null;
 }
 
 export async function guardarProducto(
@@ -250,14 +251,28 @@ export async function exportarCsv(tabla: 'clientes' | 'pedidos'): Promise<string
   if (tabla === 'clientes') {
     const { data } = await supabase
       .from('clientes')
-      .select('nombre, whatsapp, email, pais, ciudad, origen, created_at')
+      .select(
+        'nombre, whatsapp, email, pais, ciudad, origen, es_premium, nombre_tienda, fanpage, rubro, created_at'
+      )
       .order('created_at', { ascending: false });
     const filas = data ?? [];
-    const cab = 'nombre,whatsapp,email,pais,ciudad,origen,fecha';
+    const cab = 'nombre,whatsapp,email,pais,ciudad,origen,premium,tienda,fanpage,rubro,fecha';
     return [
       cab,
       ...filas.map((c) =>
-        [c.nombre, c.whatsapp, c.email ?? '', c.pais, c.ciudad ?? '', c.origen, c.created_at]
+        [
+          c.nombre,
+          c.whatsapp,
+          c.email ?? '',
+          c.pais,
+          c.ciudad ?? '',
+          c.origen,
+          c.es_premium ? 'si' : 'no',
+          c.nombre_tienda ?? '',
+          c.fanpage ?? '',
+          c.rubro ?? '',
+          c.created_at,
+        ]
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
           .join(',')
       ),
@@ -265,15 +280,19 @@ export async function exportarCsv(tabla: 'clientes' | 'pedidos'): Promise<string
   }
   const { data } = await supabase
     .from('pedidos')
-    .select('created_at, modalidad, clientes(nombre, whatsapp, ciudad, pais), productos(nombre, codigo)')
+    .select(
+      'created_at, modalidad, cantidad, grupo_id, clientes(nombre, whatsapp, ciudad, pais), productos(nombre, codigo)'
+    )
     .order('created_at', { ascending: false });
   const filas = (data ?? []) as unknown as {
     created_at: string;
     modalidad: string;
+    cantidad: number;
+    grupo_id: string | null;
     clientes: { nombre: string; whatsapp: string; ciudad: string | null; pais: string } | null;
     productos: { nombre: string; codigo: string | null } | null;
   }[];
-  const cab = 'fecha,cliente,whatsapp,ciudad,pais,producto,codigo,modalidad';
+  const cab = 'fecha,cliente,whatsapp,ciudad,pais,producto,codigo,modalidad,cantidad,grupo';
   return [
     cab,
     ...filas.map((p) =>
@@ -286,6 +305,8 @@ export async function exportarCsv(tabla: 'clientes' | 'pedidos'): Promise<string
         p.productos?.nombre ?? '',
         p.productos?.codigo ?? '',
         p.modalidad,
+        p.cantidad ?? 1,
+        p.grupo_id ?? '',
       ]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
         .join(',')

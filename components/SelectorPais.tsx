@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { COOKIE_PAIS, esPais } from '@/lib/pais';
 import type { Pais } from '@/lib/tipos';
@@ -14,10 +14,13 @@ function guardarPais(pais: Pais) {
   document.cookie = `${COOKIE_PAIS}=${pais}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
 }
 
-/** Barra de primera visita: "¿Desde dónde nos visitas?" */
-export function BarraPais({ paisActual }: { paisActual: Pais | null }) {
+/**
+ * Conmutador de país BO/AR del header. Absorbe la lógica de primera visita:
+ * si no hay cookie pero sí localStorage, sincroniza y refresca.
+ * Sin país elegido, ninguna bandera queda activa (la logística asume BO).
+ */
+export function ConmutadorPais({ paisActual }: { paisActual: Pais | null }) {
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (paisActual) return;
@@ -31,56 +34,32 @@ export function BarraPais({ paisActual }: { paisActual: Pais | null }) {
     if (esPais(guardado)) {
       guardarPais(guardado);
       router.refresh();
-    } else {
-      setVisible(true);
     }
   }, [paisActual, router]);
 
-  if (!visible || paisActual) return null;
-
-  const elegir = (pais: Pais) => {
-    guardarPais(pais);
-    setVisible(false);
-    router.refresh();
-  };
-
-  return (
-    <div className="bg-amarillo/95 text-tinta">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-2 px-4 py-2 text-sm font-semibold">
-        <span>¿Desde dónde nos visitas?</span>
-        <button
-          onClick={() => elegir('BO')}
-          className="rounded-full bg-white px-4 py-1.5 shadow-sm hover:bg-celeste hover:text-white"
-        >
-          🇧🇴 Bolivia
-        </button>
-        <button
-          onClick={() => elegir('AR')}
-          className="rounded-full bg-white px-4 py-1.5 shadow-sm hover:bg-celeste hover:text-white"
-        >
-          🇦🇷 Argentina
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/** Conmutador compacto siempre accesible en el header. */
-export function ConmutadorPais({ paisActual }: { paisActual: Pais | null }) {
-  const router = useRouter();
   const cambiar = (pais: Pais) => {
     guardarPais(pais);
     router.refresh();
   };
+
   return (
-    <div className="flex items-center gap-1 rounded-full bg-white/80 p-1 text-xs font-bold shadow-inner">
+    <div
+      className="flex items-center gap-1 rounded-full bg-white/80 p-1 text-xs font-bold shadow-inner ring-1 ring-tinta/10"
+      role="group"
+      aria-label="¿Desde dónde nos visitas?"
+    >
       {(['BO', 'AR'] as Pais[]).map((p) => (
         <button
           key={p}
           onClick={() => cambiar(p)}
           aria-pressed={paisActual === p}
-          className={`rounded-full px-2 py-1 ${
-            paisActual === p ? 'bg-celeste text-white' : 'text-tinta/70 hover:bg-celeste/10'
+          title={p === 'BO' ? 'Nos visitas desde Bolivia' : 'Nos visitas desde Argentina'}
+          className={`rounded-full px-2 py-1 transition ${
+            paisActual === p
+              ? 'bg-celeste text-white'
+              : paisActual
+                ? 'text-tinta/50 hover:bg-celeste/10'
+                : 'animate-pulse text-tinta/80 hover:bg-celeste/10'
           }`}
         >
           {p === 'BO' ? '🇧🇴 BO' : '🇦🇷 AR'}

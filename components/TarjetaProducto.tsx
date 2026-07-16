@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import PrecioProducto from './PrecioProducto';
-import BotonPedido from './BotonPedido';
+import BotonAgregarCarrito from './BotonAgregarCarrito';
 import type { Pais, Producto } from '@/lib/tipos';
 
 export default function TarjetaProducto({
@@ -52,12 +52,12 @@ export default function TarjetaProducto({
         <PrecioProducto producto={producto} />
         <p className="text-xs text-tinta/50">Por docena y por caja</p>
         <div className="mt-auto">
-          <BotonPedido
+          <BotonAgregarCarrito
             productoId={producto.id}
+            slug={producto.slug}
             nombre={producto.nombre}
             codigo={producto.codigo}
-            pais={pais}
-            categoria={producto.categorias?.nombre ?? null}
+            imagen={imagen?.url ?? null}
             compacto
           />
         </div>
