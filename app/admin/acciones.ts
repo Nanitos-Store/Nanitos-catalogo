@@ -341,12 +341,29 @@ export async function enviarNotificacionPush(datos: {
   if (!titulo || !mensaje) {
     return { ok: false, error: 'Completa el título y el mensaje.' };
   }
-  const publica = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const privada = process.env.VAPID_PRIVATE_KEY;
+  // Las variables de entorno a veces llegan con comillas o espacios extra
+  // por cómo se pegan en el panel de Vercel — se limpian antes de usarlas.
+  const limpiarClave = (v: string | undefined) =>
+    (v ?? '').trim().replace(/^["']|["']$/g, '');
+  const publica = limpiarClave(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
+  const privada = limpiarClave(process.env.VAPID_PRIVATE_KEY);
   if (!publica || !privada) {
     return {
       ok: false,
       error: 'Faltan las claves VAPID en las variables de entorno del servidor.',
+    };
+  }
+  const base64url = /^[A-Za-z0-9_-]+$/;
+  if (!base64url.test(publica) || publica.length < 80) {
+    return {
+      ok: false,
+      error: `NEXT_PUBLIC_VAPID_PUBLIC_KEY parece incompleta o mal copiada (${publica.length} caracteres; debería tener 87). Vuelve a pegarla en Vercel sin comillas ni saltos de línea.`,
+    };
+  }
+  if (!base64url.test(privada) || privada.length < 35) {
+    return {
+      ok: false,
+      error: `VAPID_PRIVATE_KEY parece incompleta o mal copiada (${privada.length} caracteres; debería tener 43). Vuelve a pegarla en Vercel sin comillas ni saltos de línea.`,
     };
   }
   const admin = crearClienteAdmin();
