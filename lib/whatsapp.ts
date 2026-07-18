@@ -36,26 +36,42 @@ export function mensajePedido(opciones: {
   );
 }
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://jugueteriananitos.shop';
+
+function textoCantidad(modalidad: Modalidad, cantidad: number) {
+  if (modalidad === 'ambas') return 'consultar docena y caja';
+  const unidad = modalidad === 'caja' ? 'caja' : 'docena';
+  return cantidad === 1 ? `1 ${unidad}` : `${cantidad} ${unidad}s`;
+}
+
+/**
+ * Mensaje del pedido por carrito. Cada línea lleva la URL directa a la foto
+ * estática alojada en el sitio, para que el admin vea el producto sin abrir
+ * la base de datos.
+ */
 export function mensajePedidoCarrito(opciones: {
   nombre: string;
   ciudad: string;
   pais: Pais;
-  items: { nombre: string; codigo: string | null; modalidad: Modalidad; cantidad: number }[];
-  identificador?: string;
+  telefono: string;
+  items: { nombre: string; slug: string; codigo: string | null; modalidad: Modalidad; cantidad: number }[];
 }) {
-  const { nombre, ciudad, pais, items } = opciones;
-  const id = opciones.identificador ?? 'web-catalogo';
+  const { nombre, ciudad, pais, telefono, items } = opciones;
   const lineas = items
     .map((i) => {
-      const cod = i.codigo ? ` (Cód. ${i.codigo})` : '';
-      const cant = i.modalidad === 'ambas' ? '' : ` ×${i.cantidad}`;
-      return `• ${i.nombre}${cod} — ${TEXTO_MODALIDAD[i.modalidad]}${cant}`;
+      const codigo = i.codigo ?? i.nombre;
+      const foto = `${SITE_URL}/productos/${i.slug}.webp`;
+      return `- ${codigo} - ${textoCantidad(i.modalidad, i.cantidad)} - (Foto: ${foto})`;
     })
     .join('\n');
   return (
-    `Hola 👋 Soy ${nombre} de ${ciudad}, ${NOMBRE_PAIS[pais]}.\n` +
-    `Quiero hacer este pedido:\n${lineas}\n` +
-    `Vi los productos en la web de Ñañitos. [${id}]`
+    `Hola, mi nombre es ${nombre}, soy de ${ciudad}, ${NOMBRE_PAIS[pais]}, mi número de contacto es +${telefono}.\n` +
+    `\n` +
+    `Quisiera comprar estos productos:\n` +
+    `${lineas}\n` +
+    `\n` +
+    `Quedo atento a su respuesta para coordinar el pago y envío.`
   );
 }
 

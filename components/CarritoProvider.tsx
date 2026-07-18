@@ -55,19 +55,20 @@ export default function CarritoProvider({ children }: { children: React.ReactNod
     }
   }, [items, hidratado]);
 
+  // Suma en segundo plano: NO abre la hoja del carrito para no interrumpir
+  // la navegación. El contador del header refleja el cambio.
   const agregar = useCallback((item: Omit<ItemCarrito, 'cantidad'>) => {
     setItems((previos) => {
       const existente = previos.find((i) => i.productoId === item.productoId);
       if (existente) {
         return previos.map((i) =>
           i.productoId === item.productoId
-            ? { ...i, cantidad: Math.min(99, i.cantidad + 1), modalidad: item.modalidad }
+            ? { ...i, cantidad: Math.min(99, i.cantidad + 1) }
             : i
         );
       }
       return [...previos, { ...item, cantidad: 1 }];
     });
-    setAbierto(true);
   }, []);
 
   const quitar = useCallback((productoId: string) => {

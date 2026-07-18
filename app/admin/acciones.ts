@@ -3,14 +3,22 @@
 import { revalidatePath } from 'next/cache';
 import { crearClienteServidor } from '@/lib/supabase/server';
 import { crearClienteAdmin } from '@/lib/supabase/admin';
+import { sesionAdminActual } from '@/lib/admin-sesion';
 
 interface Resultado {
   ok: boolean;
   error?: string;
 }
 
-/** Verifica sesión y devuelve el cliente del usuario (RLS aplica es_admin). */
+/**
+ * Devuelve un cliente de BD autorizado: la sesión maestra del footer usa el
+ * service role; una sesión de Supabase Auth usa su propio cliente (RLS
+ * aplica es_admin).
+ */
 async function clienteAutenticado() {
+  if (sesionAdminActual()) {
+    return crearClienteAdmin();
+  }
   const supabase = crearClienteServidor();
   if (!supabase) return null;
   const {
@@ -19,8 +27,16 @@ async function clienteAutenticado() {
   return user ? supabase : null;
 }
 
+/**
+ * Regeneración estática bajo demanda: al guardar un cambio en el panel se
+ * revalida todo el árbol público (home, catálogo, productos, campañas) para
+ * que el HTML estático se actualice de inmediato en Vercel.
+ */
 function revalidarPublico() {
   revalidatePath('/', 'layout');
+  revalidatePath('/catalogo');
+  revalidatePath('/producto/[slug]', 'page');
+  revalidatePath('/campana/[slug]', 'page');
 }
 
 /** Edición rápida: precio + verificado en UNA sola acción. */
@@ -175,8 +191,9 @@ export async function eliminarCampana(campanaId: string): Promise<Resultado> {
   return { ok: true };
 }
 
-/** Verifica que quien llama es superadmin activo (consulta con su sesión). */
+/** Verifica que quien llama es superadmin activo (sesión maestra o Supabase). */
 async function esSuperadmin(): Promise<boolean> {
+  if (sesionAdminActual()) return true;
   const supabase = crearClienteServidor();
   if (!supabase) return false;
   const {

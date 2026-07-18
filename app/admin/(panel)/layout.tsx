@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { crearClienteServidor } from '@/lib/supabase/server';
+import { sesionAdminActual } from '@/lib/admin-sesion';
 import BotonSalir from '@/components/admin/BotonSalir';
 import type { Perfil } from '@/lib/tipos';
 
@@ -16,20 +17,35 @@ const NAV = [
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
-  const supabase = crearClienteServidor();
-  if (!supabase) redirect('/');
+  // Camino 1: sesión maestra del footer (cuenta nanitos-boss)
+  const sesionMaestra = sesionAdminActual();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/admin/login');
+  let perfil: Perfil | null = null;
+  if (sesionMaestra) {
+    perfil = {
+      id: 'cuenta-maestra',
+      nombre: sesionMaestra.nombre,
+      rol: 'superadmin',
+      activo: true,
+      created_at: '',
+    };
+  } else {
+    // Camino 2: Supabase Auth (correo/contraseña o Google) + tabla perfiles
+    const supabase = crearClienteServidor();
+    if (!supabase) redirect('/');
 
-  const { data } = await supabase
-    .from('perfiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  const perfil = data as Perfil | null;
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect('/admin/login');
+
+    const { data } = await supabase
+      .from('perfiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    perfil = data as Perfil | null;
+  }
 
   if (!perfil || !perfil.activo) {
     return (

@@ -30,11 +30,15 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Sesión del login maestro del footer (la firma se verifica en el layout,
+  // que corre en Node; aquí solo decidimos la redirección)
+  const sesionMaestra = Boolean(request.cookies.get('nanitos_admin_sesion')?.value);
+
   const esLogin = request.nextUrl.pathname === '/admin/login';
-  if (!user && !esLogin) {
+  if (!user && !sesionMaestra && !esLogin) {
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
-  if (user && esLogin) {
+  if ((user || sesionMaestra) && esLogin) {
     return NextResponse.redirect(new URL('/admin', request.url));
   }
   return respuesta;

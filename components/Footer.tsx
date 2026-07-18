@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import LoginFooter from './LoginFooter';
 import { enlaceWhatsApp, mensajeConsulta, NUMERO_WHATSAPP } from '@/lib/whatsapp';
 
 export const REDES_SOCIALES = [
@@ -106,9 +107,7 @@ export default function Footer() {
       <div className="flex items-center justify-center gap-3 border-t border-white/10 py-4 text-center text-xs text-white/60">
         <span>© {new Date().getFullYear()} Juguetería Ñañitos — Bermejo, Bolivia</span>
         <span aria-hidden="true">·</span>
-        <Link href="/admin" className="hover:text-white/90 hover:underline">
-          Administración
-        </Link>
+        <LoginFooter />
       </div>
     </footer>
   );

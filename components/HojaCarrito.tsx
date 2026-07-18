@@ -10,19 +10,10 @@ import { leerUtms, trackEvento } from '@/lib/meta';
 import type { ClienteLocal, Modalidad, Pais } from '@/lib/tipos';
 
 const OPCIONES_MODALIDAD: { valor: Modalidad; texto: string }[] = [
-  { valor: 'docena', texto: 'Docena' },
   { valor: 'caja', texto: 'Caja' },
+  { valor: 'docena', texto: 'Docena' },
   { valor: 'ambas', texto: 'Conocer ambas' },
 ];
-
-function identificadorPedido() {
-  const utms = leerUtms();
-  if (utms.utm_campaign) {
-    const corto = utms.utm_campaign.replace(/[^a-z0-9]/gi, '').slice(0, 8).toLowerCase();
-    if (corto) return `web-camp-${corto}`;
-  }
-  return 'web-catalogo';
-}
 
 /** Hoja del pedido: todos los productos agregados, un solo WhatsApp. */
 export default function HojaCarrito({ pais }: { pais: Pais | null }) {
@@ -38,8 +29,8 @@ export default function HojaCarrito({ pais }: { pais: Pais | null }) {
       nombre: cliente.nombre,
       ciudad: cliente.ciudad,
       pais: cliente.pais,
+      telefono: cliente.telefono,
       items: carrito.items,
-      identificador: identificadorPedido(),
     });
     trackEvento('Lead', {
       content_type: 'product_group',

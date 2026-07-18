@@ -1,16 +1,20 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { useCarrito } from './CarritoProvider';
 import type { Modalidad } from '@/lib/tipos';
 
-/** CTA "Agregar al pedido": suma el producto al carrito y abre la hoja. */
+/**
+ * CTA "Añadir al carrito": suma el producto en segundo plano con una
+ * confirmación breve en el propio botón, sin abrir la lista del carrito.
+ */
 export default function BotonAgregarCarrito({
   productoId,
   slug,
   nombre,
   codigo,
   imagen,
-  modalidadInicial = 'docena',
+  modalidadInicial = 'caja',
   compacto = false,
 }: {
   productoId: string;
@@ -22,23 +26,31 @@ export default function BotonAgregarCarrito({
   compacto?: boolean;
 }) {
   const carrito = useCarrito();
+  const [agregado, setAgregado] = useState(false);
+  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const agregar = () => {
+    carrito.agregar({
+      productoId,
+      slug,
+      nombre,
+      codigo,
+      imagen,
+      modalidad: modalidadInicial,
+    });
+    setAgregado(true);
+    if (temporizador.current) clearTimeout(temporizador.current);
+    temporizador.current = setTimeout(() => setAgregado(false), 1400);
+  };
+
   return (
     <button
-      onClick={() =>
-        carrito.agregar({
-          productoId,
-          slug,
-          nombre,
-          codigo,
-          imagen,
-          modalidad: modalidadInicial,
-        })
-      }
-      className={`boton w-full rounded-xl bg-whatsapp font-bold text-white shadow-md transition hover:brightness-105 ${
-        compacto ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'
-      }`}
+      onClick={agregar}
+      className={`boton w-full rounded-xl font-bold text-white shadow-md transition hover:brightness-105 ${
+        agregado ? 'bg-verde' : 'bg-whatsapp'
+      } ${compacto ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'}`}
     >
-      Agregar al pedido
+      {agregado ? '✓ Añadido' : 'Añadir al carrito'}
     </button>
   );
 }

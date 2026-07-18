@@ -2,13 +2,15 @@
 
 import { useRouter } from 'next/navigation';
 import { crearClienteNavegador } from '@/lib/supabase/client';
+import { cerrarSesionAdmin } from '@/app/acciones/admin-sesion';
 
 export default function BotonSalir() {
   const router = useRouter();
   const salir = async () => {
+    await cerrarSesionAdmin();
     const supabase = crearClienteNavegador();
     await supabase?.auth.signOut();
-    router.push('/admin/login');
+    router.push('/');
     router.refresh();
   };
   return (

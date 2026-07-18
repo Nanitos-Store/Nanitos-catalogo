@@ -113,6 +113,9 @@ export interface Perfil {
 export interface ClienteLocal {
   id: string;
   nombre: string;
+  /** Departamento (BO) o provincia (AR). */
   ciudad: string;
   pais: Pais;
+  /** Número tal como lo escribió el cliente, con prefijo normalizado. */
+  telefono: string;
 }
