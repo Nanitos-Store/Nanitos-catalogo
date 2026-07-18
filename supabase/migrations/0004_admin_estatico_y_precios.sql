@@ -1,8 +1,10 @@
 -- ÑAÑITOS — Cuenta maestra de administración (login del footer) y
 -- activación de los precios por caja del catálogo.
 -- Ejecutar DESPUÉS de 0003.
+-- Nota Supabase: pgcrypto vive en el esquema "extensions", por eso las
+-- funciones usan search_path = public, extensions.
 
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 -- ==========================================================================
 -- CUENTAS ADMIN (login estático del footer, independiente de Supabase Auth)
@@ -22,10 +24,10 @@ alter table public.cuentas_admin enable row level security;
 -- Verifica usuario y contraseña; devuelve el nombre del perfil si coinciden.
 create or replace function public.admin_verificar(p_usuario text, p_password text)
 returns text
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, extensions as $$
   select nombre from public.cuentas_admin
   where usuario = p_usuario
-    and password_hash = crypt(p_password, password_hash);
+    and password_hash = extensions.crypt(p_password, password_hash);
 $$;
 
 -- Cambia la contraseña exigiendo la anterior. Devuelve true si lo logró.
@@ -33,25 +35,22 @@ create or replace function public.admin_cambiar_password(
   p_usuario text, p_anterior text, p_nueva text
 )
 returns boolean
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, extensions as $$
 begin
   if length(p_nueva) < 6 then
     return false;
   end if;
   update public.cuentas_admin
-  set password_hash = crypt(p_nueva, gen_salt('bf'))
+  set password_hash = extensions.crypt(p_nueva, extensions.gen_salt('bf'))
   where usuario = p_usuario
-    and password_hash = crypt(p_anterior, password_hash);
+    and password_hash = extensions.crypt(p_anterior, password_hash);
   return found;
 end;
 $$;
 
--- Bloquear la ejecución anónima directa de las funciones NO es necesario:
--- ambas exigen conocer la contraseña actual para devolver algo útil.
-
 -- Cuenta maestra inicial (cambiar la contraseña desde el perfil al entrar)
 insert into public.cuentas_admin (usuario, password_hash, nombre)
-values ('nanitos-boss', crypt('123456', gen_salt('bf')), 'Priscila')
+values ('nanitos-boss', extensions.crypt('123456', extensions.gen_salt('bf')), 'Priscila')
 on conflict (usuario) do nothing;
 
 -- ==========================================================================
