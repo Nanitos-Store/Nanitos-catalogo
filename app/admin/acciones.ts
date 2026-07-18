@@ -359,12 +359,28 @@ export async function enviarNotificacionPush(datos: {
     return { ok: false, error: 'Todavía no hay dispositivos suscritos.' };
   }
 
+  // El "subject" debe ser EXACTAMENTE "mailto:correo@dominio.com" o una URL
+  // https:// — sin comillas ni espacios extra. Si Vercel guardó un valor mal
+  // formado, web-push lanza una excepción síncrona; la atajamos acá con un
+  // mensaje claro en vez de dejar la petición colgada sin respuesta.
+  const subjectCrudo = (process.env.VAPID_SUBJECT ?? 'mailto:duomarketing2024@gmail.com').trim();
+  const subject = subjectCrudo.replace(/^["']|["']$/g, '');
+  if (!/^mailto:.+@.+\..+$/i.test(subject) && !/^https:\/\/.+/i.test(subject)) {
+    return {
+      ok: false,
+      error: `VAPID_SUBJECT tiene un formato inválido ("${subjectCrudo}"). Debe ser exactamente "mailto:correo@dominio.com", sin comillas ni espacios.`,
+    };
+  }
+
   const webpush = (await import('web-push')).default;
-  webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT ?? 'mailto:duomarketing2024@gmail.com',
-    publica,
-    privada
-  );
+  try {
+    webpush.setVapidDetails(subject, publica, privada);
+  } catch (e) {
+    return {
+      ok: false,
+      error: `No se pudieron aplicar las claves VAPID: ${(e as Error).message}`,
+    };
+  }
 
   const payload = JSON.stringify({
     title: titulo,
@@ -390,6 +406,13 @@ export async function enviarNotificacionPush(datos: {
   );
   if (muertas.length > 0) {
     await admin.from('suscripciones_push').delete().in('id', muertas);
+  }
+  if (enviadas === 0) {
+    return {
+      ok: false,
+      error: 'No se pudo entregar a ningún dispositivo (revisa las claves VAPID).',
+      fallidas: suscripciones.length,
+    };
   }
   return { ok: true, enviadas, fallidas: suscripciones.length - enviadas };
 }

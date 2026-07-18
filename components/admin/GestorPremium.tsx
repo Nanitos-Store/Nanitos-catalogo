@@ -22,19 +22,24 @@ function SeccionNotificacion({ campo }: { campo: string }) {
     if (!confirm('¿Enviar esta notificación a todos los dispositivos Premium suscritos?')) return;
     setEnviando(true);
     setResultado(null);
-    const r = await enviarNotificacionPush({ titulo, mensaje, url });
-    setEnviando(false);
-    if (!r.ok) {
-      setResultado(r.error ?? 'Error al enviar.');
-      return;
+    try {
+      const r = await enviarNotificacionPush({ titulo, mensaje, url });
+      if (!r.ok) {
+        setResultado(r.error ?? 'Error al enviar.');
+        return;
+      }
+      setResultado(
+        `✅ Enviada a ${r.enviadas} dispositivo${r.enviadas === 1 ? '' : 's'}${
+          r.fallidas ? ` (${r.fallidas} no disponibles)` : ''
+        }.`
+      );
+      setTitulo('');
+      setMensaje('');
+    } catch {
+      setResultado('❌ Fallo inesperado al enviar. Revisa tu conexión e intenta de nuevo.');
+    } finally {
+      setEnviando(false);
     }
-    setResultado(
-      `✅ Enviada a ${r.enviadas} dispositivo${r.enviadas === 1 ? '' : 's'}${
-        r.fallidas ? ` (${r.fallidas} no disponibles)` : ''
-      }.`
-    );
-    setTitulo('');
-    setMensaje('');
   };
 
   return (
