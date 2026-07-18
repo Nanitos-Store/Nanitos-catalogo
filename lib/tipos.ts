@@ -44,8 +44,31 @@ export interface Producto {
   destacado: boolean;
   orden: number;
   stock_cajas: number | null;
+  /** Porcentaje entero de descuento visible al público (1-90). */
+  descuento_pct: number | null;
+  /** Fecha en que pasa a ser público; futura = solo sección Premium. */
+  fecha_publica: string | null;
   categorias?: Categoria | null;
   producto_imagenes?: ProductoImagen[];
+}
+
+export interface CuentaPremium {
+  id: string;
+  usuario: string;
+  nombre: string;
+  cliente_id: string | null;
+  activo: boolean;
+  created_at: string;
+  clientes?: Cliente | null;
+}
+
+export interface DeseoPremium {
+  id: string;
+  cuenta_premium_id: string;
+  producto: string;
+  detalle: string | null;
+  created_at: string;
+  cuentas_premium?: Pick<CuentaPremium, 'usuario' | 'nombre'> | null;
 }
 
 export interface Campana {

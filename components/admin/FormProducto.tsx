@@ -49,6 +49,8 @@ export default function FormProducto({
     disponible: producto?.disponible ?? true,
     destacado: producto?.destacado ?? false,
     stock_cajas: producto?.stock_cajas ?? null,
+    descuento_pct: producto?.descuento_pct ?? null,
+    fecha_publica: producto?.fecha_publica ?? null,
   });
   const [imagenes, setImagenes] = useState<{ url: string }[]>(
     (producto?.producto_imagenes ?? [])
@@ -324,16 +326,50 @@ export default function FormProducto({
       </div>
 
       {datos.en_oferta && (
-        <div>
-          <label className="mb-1 block text-sm font-bold">Etiqueta de oferta</label>
-          <input
-            value={datos.etiqueta_oferta ?? ''}
-            onChange={(e) => actualizar('etiqueta_oferta', e.target.value || null)}
-            className={campo}
-            placeholder="¡Oferta especial!"
-          />
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1 block text-sm font-bold">Descuento (%)</label>
+            <input
+              value={datos.descuento_pct ?? ''}
+              onChange={(e) => {
+                const v = parseInt(e.target.value, 10);
+                actualizar('descuento_pct', Number.isFinite(v) && v > 0 ? Math.min(90, v) : null);
+              }}
+              inputMode="numeric"
+              className={campo}
+              placeholder="Ej. 20"
+            />
+            <p className="mt-1 text-xs text-tinta/50">
+              El cliente ve el precio original tachado, el nuevo precio y el %.
+            </p>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-bold">Etiqueta (si no hay %)</label>
+            <input
+              value={datos.etiqueta_oferta ?? ''}
+              onChange={(e) => actualizar('etiqueta_oferta', e.target.value || null)}
+              className={campo}
+              placeholder="¡Oferta especial!"
+            />
+          </div>
         </div>
       )}
+
+      <div>
+        <label className="mb-1 block text-sm font-bold">
+          Fecha de lanzamiento público
+        </label>
+        <input
+          type="date"
+          value={datos.fecha_publica ?? ''}
+          onChange={(e) => actualizar('fecha_publica', e.target.value || null)}
+          className={campo}
+        />
+        <p className="mt-1 text-xs text-tinta/50">
+          Vacío = visible para todos desde ya. Con fecha futura, hasta ese día el
+          producto solo aparece en la sección Premium (venta anticipada).
+        </p>
+      </div>
 
       {mensaje && <p className="font-semibold text-coral">{mensaje}</p>}
 

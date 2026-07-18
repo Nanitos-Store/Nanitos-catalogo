@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FormularioRegistro, { leerClienteLocal } from './FormularioRegistro';
 import { actualizarPremium } from '@/app/acciones/cliente';
-import { enlaceWhatsAppPremium } from '@/lib/whatsapp';
 import { trackEvento } from '@/lib/meta';
 import type { ClienteLocal, Pais } from '@/lib/tipos';
 
@@ -52,27 +51,20 @@ export default function FormularioPremium({ pais }: { pais: Pais | null }) {
   if (listo) {
     return (
       <div className="py-6 text-center">
-        <p className="text-5xl">🎉</p>
-        <h2 className="mt-3 text-xl font-bold">¡Ya eres Ñañilover Premium!</h2>
+        <p className="text-5xl">📝</p>
+        <h2 className="mt-3 text-xl font-bold">¡Recibimos tu solicitud!</h2>
         <p className="mt-2 text-tinta/70">
-          Guardamos los datos de tu emprendimiento. Desde ahora tienes una línea
-          de WhatsApp exclusiva con atención prioritaria.
+          Guardamos los datos de tu emprendimiento,{' '}
+          <strong>{cliente?.nombre}</strong>. En breve te contactaremos para
+          activar tu cuenta Premium única, con la que entras a la sección de
+          venta anticipada y lista de deseos.
         </p>
-        <a
-          href={enlaceWhatsAppPremium(
-            `Hola 👋 Soy ${cliente?.nombre ?? ''} de ${nombreTienda} y acabo de activar mi cuenta Premium en la web de Ñañitos. [web-premium]`
-          )}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-block rounded-full bg-whatsapp px-6 py-3 font-bold text-white shadow-md"
+        <Link
+          href="/catalogo"
+          className="mt-4 inline-block rounded-full bg-celeste px-6 py-3 font-bold text-white"
         >
-          ⭐ Escribir a mi asesor Premium
-        </a>
-        <div className="mt-3">
-          <Link href="/catalogo" className="text-sm font-bold text-celeste">
-            Seguir explorando el catálogo →
-          </Link>
-        </div>
+          Seguir explorando el catálogo
+        </Link>
       </div>
     );
   }

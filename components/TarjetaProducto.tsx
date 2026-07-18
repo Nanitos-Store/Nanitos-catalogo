@@ -22,7 +22,9 @@ export default function TarjetaProducto({
       <Link href={`/producto/${producto.slug}`} className="relative block">
         {producto.en_oferta && (
           <span className="absolute left-2 top-2 z-10 rounded-full bg-coral px-2.5 py-1 text-xs font-bold text-white">
-            {producto.etiqueta_oferta ?? '¡Oferta!'}
+            {producto.descuento_pct
+              ? `-${producto.descuento_pct}%`
+              : producto.etiqueta_oferta ?? '¡Oferta!'}
           </span>
         )}
         {!producto.disponible && (

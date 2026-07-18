@@ -30,6 +30,14 @@ export default function BotonFlotanteWhatsApp({ pais }: { pais: Pais | null }) {
 
   return (
     <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+      <a
+        href="/#ubicacion"
+        aria-label="Ver nuestra ubicación en el mapa"
+        title="Cómo llegar a la tienda"
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-celeste text-xl text-white shadow-xl transition hover:scale-105"
+      >
+        📍
+      </a>
       {abierto && (
         <div className="w-72 rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-tinta/10">
           {!pideRegistro ? (

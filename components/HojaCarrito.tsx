@@ -196,7 +196,8 @@ export default function HojaCarrito({ pais }: { pais: Pais | null }) {
               </div>
             )}
             <p className="mt-2 text-center text-xs text-tinta/50">
-              Enviamos el detalle a Valeria y coordinamos contigo por WhatsApp.
+              Tu pedido llega directo a nuestro WhatsApp y coordinamos contigo
+              el pago y el envío.
             </p>
           </>
         )}

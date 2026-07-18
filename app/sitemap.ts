@@ -12,8 +12,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = crearClienteServidor();
   if (!supabase) return estaticas;
 
+  const hoy = new Date().toISOString().slice(0, 10);
   const [productosRes, campanasRes] = await Promise.all([
-    supabase.from('productos').select('slug, updated_at').eq('disponible', true),
+    supabase
+      .from('productos')
+      .select('slug, updated_at')
+      .eq('disponible', true)
+      .or(`fecha_publica.is.null,fecha_publica.lte.${hoy}`),
     supabase.from('campanas').select('slug').eq('activa', true),
   ]);
 

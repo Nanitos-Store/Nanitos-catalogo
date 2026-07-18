@@ -15,3 +15,14 @@ export function formatearPrecio(valor: number, moneda: 'USD' | 'BOB') {
     maximumFractionDigits: 2,
   })}`;
 }
+
+/** Descuento activo: producto en oferta con porcentaje entero definido. */
+export function descuentoActivo(
+  p: Pick<Producto, 'en_oferta' | 'descuento_pct'>
+): number | null {
+  return p.en_oferta && p.descuento_pct ? p.descuento_pct : null;
+}
+
+export function aplicarDescuento(valor: number, pct: number) {
+  return Math.round(valor * (1 - pct / 100) * 100) / 100;
+}

@@ -33,9 +33,12 @@ export async function cargarPaginaCatalogo(
   const supabase = crearClienteServidor();
   if (!supabase) return { productos: [], siguiente: null };
 
+  const hoy = new Date().toISOString().slice(0, 10);
   let query = supabase
     .from('productos')
     .select('*, categorias!inner(*), producto_imagenes(*)')
+    // Los lanzamientos con fecha futura solo se ven en la sección Premium
+    .or(`fecha_publica.is.null,fecha_publica.lte.${hoy}`)
     .order('orden', { ascending: true })
     .order('id', { ascending: true })
     .limit(TAMANO_PAGINA);

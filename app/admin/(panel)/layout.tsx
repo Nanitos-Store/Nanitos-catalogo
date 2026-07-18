@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
 const NAV = [
   { href: '/admin', texto: '📊 Inicio' },
   { href: '/admin/productos', texto: '🧸 Productos' },
+  { href: '/admin/premium', texto: '⭐ Premium' },
   { href: '/admin/campanas', texto: '📣 Campañas' },
   { href: '/admin/clientes', texto: '👥 Clientes' },
   { href: '/admin/pedidos', texto: '🧾 Pedidos' },

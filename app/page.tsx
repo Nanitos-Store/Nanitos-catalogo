@@ -24,6 +24,7 @@ async function obtenerDatos(pais: Pais | null) {
       .select('*, categorias(*), producto_imagenes(*)')
       .eq('disponible', true)
       .eq('destacado', true)
+      .or(`fecha_publica.is.null,fecha_publica.lte.${hoy}`)
       .order('orden')
       .limit(8),
     supabase
@@ -31,6 +32,7 @@ async function obtenerDatos(pais: Pais | null) {
       .select('*, categorias(*), producto_imagenes(*)')
       .eq('disponible', true)
       .eq('en_oferta', true)
+      .or(`fecha_publica.is.null,fecha_publica.lte.${hoy}`)
       .order('orden')
       .limit(4),
     supabase
@@ -197,7 +199,7 @@ export default async function Home() {
       </section>
 
       {/* Confianza + ubicación */}
-      <section className="mt-10 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-tinta/5">
+      <section id="ubicacion" className="mt-10 scroll-mt-24 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-tinta/5">
         <div className="flex flex-col items-center gap-4 p-6 sm:flex-row">
           <Image
             src="/brand/logo-nanitos.png"
@@ -206,10 +208,11 @@ export default async function Home() {
             height={64}
           />
           <div>
-            <h2 className="text-lg font-bold">Una tienda real, con atención real</h2>
+            <h2 className="text-lg font-bold">Te esperamos en Bermejo 🏪</h2>
             <p className="mt-1 text-sm text-tinta/70">
-              Estamos en Calle Colorados, frente al Hotel La Costa, en Bermejo.
-              Puedes visitarnos, escribirnos por WhatsApp o seguirnos en redes.
+              Nos encuentras en Calle Colorados, frente al Hotel La Costa. Pasa a
+              conocer la tienda cuando quieras — y si estás lejos, escríbenos por
+              WhatsApp o síguenos en redes: siempre hay novedades llegando.
             </p>
             <a
               href="https://maps.app.goo.gl/eNGnLRsE3otx73kJ7"

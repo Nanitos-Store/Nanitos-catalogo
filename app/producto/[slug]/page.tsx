@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { crearClienteServidor } from '@/lib/supabase/server';
+import { sesionPremiumActual } from '@/lib/premium-sesion';
 import { COOKIE_PAIS, esPais } from '@/lib/pais';
 import { puedeMostrarPrecio } from '@/lib/precios';
 import GaleriaProducto from '@/components/GaleriaProducto';
@@ -55,6 +56,12 @@ export default async function PaginaProducto({ params }: Props) {
   const producto = await obtenerProducto(params.slug);
   if (!producto) notFound();
 
+  // Lanzamiento anticipado: antes de su fecha pública solo lo ve Premium
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (producto.fecha_publica && producto.fecha_publica > hoy && !sesionPremiumActual()) {
+    notFound();
+  }
+
   const cookiePais = cookies().get(COOKIE_PAIS)?.value;
   const pais: Pais | null = esPais(cookiePais) ? cookiePais : null;
 
@@ -67,6 +74,7 @@ export default async function PaginaProducto({ params }: Props) {
           .eq('categoria_id', producto.categoria_id)
           .eq('disponible', true)
           .neq('id', producto.id)
+          .or(`fecha_publica.is.null,fecha_publica.lte.${hoy}`)
           .order('destacado', { ascending: false })
           .limit(4)
       : { data: [] };
@@ -113,7 +121,9 @@ export default async function PaginaProducto({ params }: Props) {
           <div>
             {producto.en_oferta && (
               <span className="mb-2 inline-block rounded-full bg-coral px-3 py-1 text-xs font-bold text-white">
-                {producto.etiqueta_oferta ?? '¡Oferta especial!'}
+                {producto.descuento_pct
+                  ? `-${producto.descuento_pct}% de descuento`
+                  : producto.etiqueta_oferta ?? '¡Oferta especial!'}
               </span>
             )}
             <h1 className="text-2xl font-bold leading-tight">{producto.nombre}</h1>

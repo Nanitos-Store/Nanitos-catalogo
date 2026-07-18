@@ -95,6 +95,8 @@ export interface DatosProducto {
   mostrar_precio: boolean;
   en_oferta: boolean;
   etiqueta_oferta: string | null;
+  descuento_pct: number | null;
+  fecha_publica: string | null;
   disponible: boolean;
   destacado: boolean;
   stock_cajas: number | null;
@@ -258,6 +260,54 @@ export async function cambiarEstadoAdmin(
     .neq('rol', 'superadmin');
   if (error) return { ok: false, error: 'No se pudo actualizar.' };
   revalidatePath('/admin/administradores');
+  return { ok: true };
+}
+
+/** Crea una cuenta Premium (solo superadmin / cuenta maestra). */
+export async function crearCuentaPremium(datos: {
+  usuario: string;
+  password: string;
+  nombre: string;
+  clienteId: string | null;
+}): Promise<Resultado> {
+  if (!(await esSuperadmin())) {
+    return { ok: false, error: 'Solo la cuenta principal puede crear cuentas Premium.' };
+  }
+  const usuario = datos.usuario.trim().toLowerCase();
+  if (usuario.length < 3) return { ok: false, error: 'El usuario necesita al menos 3 caracteres.' };
+  if (datos.password.length < 6) {
+    return { ok: false, error: 'La contraseña necesita al menos 6 caracteres.' };
+  }
+  if (datos.nombre.trim().length < 2) return { ok: false, error: 'Escribe el nombre del cliente.' };
+
+  const admin = crearClienteAdmin();
+  if (!admin) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.' };
+  const { error } = await admin.rpc('premium_crear', {
+    p_usuario: usuario,
+    p_password: datos.password,
+    p_nombre: datos.nombre.trim(),
+    p_cliente_id: datos.clienteId,
+  });
+  if (error) return { ok: false, error: 'No se pudo crear (¿usuario repetido?).' };
+  revalidatePath('/admin/premium');
+  return { ok: true };
+}
+
+export async function cambiarEstadoCuentaPremium(
+  cuentaId: string,
+  activo: boolean
+): Promise<Resultado> {
+  if (!(await esSuperadmin())) {
+    return { ok: false, error: 'Solo la cuenta principal puede gestionar cuentas Premium.' };
+  }
+  const admin = crearClienteAdmin();
+  if (!admin) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.' };
+  const { error } = await admin
+    .from('cuentas_premium')
+    .update({ activo })
+    .eq('id', cuentaId);
+  if (error) return { ok: false, error: 'No se pudo actualizar.' };
+  revalidatePath('/admin/premium');
   return { ok: true };
 }
 
