@@ -324,6 +324,76 @@ export async function eliminarCuentaPremium(cuentaId: string): Promise<Resultado
   return { ok: true };
 }
 
+/**
+ * Envía una notificación push a todos los dispositivos Premium suscritos.
+ * Limpia automáticamente las suscripciones muertas (404/410).
+ */
+export async function enviarNotificacionPush(datos: {
+  titulo: string;
+  mensaje: string;
+  url: string;
+}): Promise<Resultado & { enviadas?: number; fallidas?: number }> {
+  if (!(await esSuperadmin())) {
+    return { ok: false, error: 'Solo la cuenta principal puede enviar notificaciones.' };
+  }
+  const titulo = datos.titulo.trim();
+  const mensaje = datos.mensaje.trim();
+  if (!titulo || !mensaje) {
+    return { ok: false, error: 'Completa el título y el mensaje.' };
+  }
+  const publica = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privada = process.env.VAPID_PRIVATE_KEY;
+  if (!publica || !privada) {
+    return {
+      ok: false,
+      error: 'Faltan las claves VAPID en las variables de entorno del servidor.',
+    };
+  }
+  const admin = crearClienteAdmin();
+  if (!admin) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.' };
+
+  const { data: suscripciones } = await admin
+    .from('suscripciones_push')
+    .select('id, endpoint, p256dh, auth');
+  if (!suscripciones || suscripciones.length === 0) {
+    return { ok: false, error: 'Todavía no hay dispositivos suscritos.' };
+  }
+
+  const webpush = (await import('web-push')).default;
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT ?? 'mailto:duomarketing2024@gmail.com',
+    publica,
+    privada
+  );
+
+  const payload = JSON.stringify({
+    title: titulo,
+    body: mensaje,
+    url: datos.url.trim() || '/premium',
+  });
+
+  let enviadas = 0;
+  const muertas: string[] = [];
+  await Promise.all(
+    suscripciones.map(async (s) => {
+      try {
+        await webpush.sendNotification(
+          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+          payload
+        );
+        enviadas++;
+      } catch (error) {
+        const codigo = (error as { statusCode?: number }).statusCode;
+        if (codigo === 404 || codigo === 410) muertas.push(s.id);
+      }
+    })
+  );
+  if (muertas.length > 0) {
+    await admin.from('suscripciones_push').delete().in('id', muertas);
+  }
+  return { ok: true, enviadas, fallidas: suscripciones.length - enviadas };
+}
+
 /** Export CSV (clientes o pedidos) generado en el servidor. */
 export async function exportarCsv(tabla: 'clientes' | 'pedidos'): Promise<string> {
   const supabase = await clienteAutenticado();

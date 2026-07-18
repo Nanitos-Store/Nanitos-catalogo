@@ -8,6 +8,7 @@ import {
   cerrarSesionPremium,
   quitarDeseo,
 } from '@/app/acciones/premium';
+import BotonNotificaciones from './BotonNotificaciones';
 import type { DeseoPremium } from '@/lib/tipos';
 
 /** Herramientas del cliente Premium: lista de deseos, contraseña y salida. */
@@ -69,6 +70,16 @@ export default function PanelPremium({
 
   return (
     <div className="space-y-4">
+      {/* Avisos push */}
+      <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-tinta/5">
+        <h2 className="text-lg font-bold">🔔 Avisos de novedades</h2>
+        <p className="mb-3 mt-1 text-sm text-tinta/70">
+          Recibe una notificación en tu celular o computadora cuando publiquemos
+          lanzamientos anticipados u ofertas para Premium.
+        </p>
+        <BotonNotificaciones />
+      </div>
+
       {/* Lista de deseos */}
       <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-tinta/5">
         <h2 className="text-lg font-bold">💡 Mi lista de deseos</h2>

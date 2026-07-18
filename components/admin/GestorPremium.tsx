@@ -6,8 +6,80 @@ import {
   cambiarEstadoCuentaPremium,
   crearCuentaPremium,
   eliminarCuentaPremium,
+  enviarNotificacionPush,
 } from '@/app/admin/acciones';
 import type { Cliente, CuentaPremium, DeseoPremium } from '@/lib/tipos';
+
+function SeccionNotificacion({ campo }: { campo: string }) {
+  const [titulo, setTitulo] = useState('');
+  const [mensaje, setMensaje] = useState('');
+  const [url, setUrl] = useState('/premium');
+  const [resultado, setResultado] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const enviar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!confirm('¿Enviar esta notificación a todos los dispositivos Premium suscritos?')) return;
+    setEnviando(true);
+    setResultado(null);
+    const r = await enviarNotificacionPush({ titulo, mensaje, url });
+    setEnviando(false);
+    if (!r.ok) {
+      setResultado(r.error ?? 'Error al enviar.');
+      return;
+    }
+    setResultado(
+      `✅ Enviada a ${r.enviadas} dispositivo${r.enviadas === 1 ? '' : 's'}${
+        r.fallidas ? ` (${r.fallidas} no disponibles)` : ''
+      }.`
+    );
+    setTitulo('');
+    setMensaje('');
+  };
+
+  return (
+    <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-tinta/5">
+      <h2 className="mb-1 text-lg font-bold">🔔 Enviar notificación push</h2>
+      <p className="mb-3 text-sm text-tinta/70">
+        Llega al celular o computadora de los clientes Premium que activaron los
+        avisos (aunque tengan la web cerrada).
+      </p>
+      <form onSubmit={enviar} className="space-y-2">
+        <input
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          required
+          maxLength={60}
+          placeholder="Título (ej. ¡Llegaron los Labubu gigantes!)"
+          className={campo}
+        />
+        <textarea
+          value={mensaje}
+          onChange={(e) => setMensaje(e.target.value)}
+          required
+          maxLength={180}
+          rows={2}
+          placeholder="Mensaje corto (ej. Ya puedes reservar tu caja en la sección Premium.)"
+          className={campo}
+        />
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enlace al tocar la notificación (ej. /premium)"
+          className={campo}
+        />
+        {resultado && <p className="text-sm font-semibold">{resultado}</p>}
+        <button
+          type="submit"
+          disabled={enviando}
+          className="rounded-xl bg-naranja px-6 py-3 font-bold text-white disabled:opacity-60"
+        >
+          {enviando ? 'Enviando…' : 'Enviar notificación'}
+        </button>
+      </form>
+    </section>
+  );
+}
 
 function slugUsuario(texto: string) {
   return texto
@@ -92,6 +164,9 @@ export default function GestorPremium({
 
   return (
     <div className="space-y-5">
+      {/* Notificación push */}
+      <SeccionNotificacion campo={campo} />
+
       {/* Solicitudes pendientes */}
       <section>
         <h2 className="mb-2 text-lg font-bold">
