@@ -311,6 +311,19 @@ export async function cambiarEstadoCuentaPremium(
   return { ok: true };
 }
 
+/** Elimina una cuenta Premium (y su lista de deseos, por cascada). */
+export async function eliminarCuentaPremium(cuentaId: string): Promise<Resultado> {
+  if (!(await esSuperadmin())) {
+    return { ok: false, error: 'Solo la cuenta principal puede eliminar cuentas Premium.' };
+  }
+  const admin = crearClienteAdmin();
+  if (!admin) return { ok: false, error: 'Falta SUPABASE_SERVICE_ROLE_KEY en el servidor.' };
+  const { error } = await admin.from('cuentas_premium').delete().eq('id', cuentaId);
+  if (error) return { ok: false, error: 'No se pudo eliminar.' };
+  revalidatePath('/admin/premium');
+  return { ok: true };
+}
+
 /** Export CSV (clientes o pedidos) generado en el servidor. */
 export async function exportarCsv(tabla: 'clientes' | 'pedidos'): Promise<string> {
   const supabase = await clienteAutenticado();

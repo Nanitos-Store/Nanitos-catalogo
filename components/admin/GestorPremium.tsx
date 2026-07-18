@@ -2,7 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { cambiarEstadoCuentaPremium, crearCuentaPremium } from '@/app/admin/acciones';
+import {
+  cambiarEstadoCuentaPremium,
+  crearCuentaPremium,
+  eliminarCuentaPremium,
+} from '@/app/admin/acciones';
 import type { Cliente, CuentaPremium, DeseoPremium } from '@/lib/tipos';
 
 function slugUsuario(texto: string) {
@@ -70,6 +74,17 @@ export default function GestorPremium({
 
   const cambiarEstado = async (cuenta: CuentaPremium) => {
     await cambiarEstadoCuentaPremium(cuenta.id, !cuenta.activo);
+    router.refresh();
+  };
+
+  const eliminar = async (cuenta: CuentaPremium) => {
+    if (
+      !confirm(
+        `¿Eliminar la cuenta Premium de "${cuenta.nombre}" (${cuenta.usuario})? Se borra también su lista de deseos y no se puede deshacer.`
+      )
+    )
+      return;
+    await eliminarCuentaPremium(cuenta.id);
     router.refresh();
   };
 
@@ -188,6 +203,12 @@ export default function GestorPremium({
                 }`}
               >
                 {c.activo ? 'Desactivar' : 'Activar'}
+              </button>
+              <button
+                onClick={() => void eliminar(c)}
+                className="rounded-full bg-coral px-4 py-1.5 text-sm font-bold text-white"
+              >
+                Eliminar
               </button>
             </li>
           ))}
